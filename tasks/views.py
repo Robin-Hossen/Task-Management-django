@@ -15,7 +15,18 @@ def dashboard(request):
     return render(request,'dashboard/dashboard.html')
 
 def task(request):
+    
     context={
-        'message':'This is the task page'
+        "person":
+            {
+                "name":"robin",
+                "age":25,
+                "villages":"kabli para",
+                "city":"pabna"
+            },
+        
+        "public":["horot","hafijul","asif","sabbir","jahid"],
+        "list1":[1,2,3,4,5,6,7,8,9]
+
     }
     return render(request,'task.html',context)

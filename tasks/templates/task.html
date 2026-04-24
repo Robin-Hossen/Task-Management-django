@@ -8,7 +8,20 @@
 </head>
 <body>
     <h1>Welcome to the Task Management System</h1>
-    <p>{{ message }}</p>
-    <p></p>
+
+    <ul>
+    {% for key,value in person.items %}
+    <li>
+        {{key}}: {{value}}
+    </li>
+   
+    {% endfor %}
+    </ul>
+ 
+    {% for l in list1 %}
+      {% if not l|divisibleby:2  or l|divisibleby:2 %}
+        <p>{{l}}</p>
+      {% endif %}
+    {% endfor %}
 </body>
 </html>
