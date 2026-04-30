@@ -10,7 +10,34 @@ from django.db.models import Q,Max,Min,Count,Avg#Q object ar kaj hosse complex q
 
 
 def manager_dashboard(request):
-    return render(request,"dashboard/manager_dashboard.html")
+    tasks=Task.objects.select_related("details").prefetch_related("assigned_to").all()#query kom korar select_related and prefetch_related use korechi.karon here is perform one to one and many to many relation.
+    #getting total task
+    # total_task=tasks.count()    
+    # completed_task=tasks.filter(status="COMPLETED").count()
+    # in_progress_task=tasks.filter(status="IN_PROGRESS").count()
+    # pending_tasks=tasks.filter(status="PENDING").count()
+
+
+    # count={
+    #     "total_task":total_task,
+    #     "completed_task":completed_task,
+    #     "in_progress_task":in_progress_task,
+    #     "pending_tasks":pending_tasks
+    # }
+
+    count=Task.objects.aggregate(
+        total=Count('id'),
+        completed_task=Count('id',filter=Q(status="COMPLETED")),
+        in_progress_task=Count('id',filter=Q(status="IN_PROGRESS")),
+        pending_tasks=Count('id',filter=Q(status="PENDING"))
+        )
+
+
+    context={
+        "tasks":tasks,
+        "count":count
+    }
+    return render(request,"dashboard/manager_dashboard.html",context)
 
 def user_dashboard(request):
     return render(request,'dashboard/user_dashboard.html')
@@ -133,8 +160,8 @@ def create_task(request):
 def view_tasks(request):  
     # task_count=Task.objects.aggregate(num_count=Count('id'))#count ar kaj hosse database theke task er total count nia aslam
     
-     projects=Project.objects.annotate(task_count=Count('task')).order_by('task_count')#annotate ar kaj hosse database theke project er sathe task er count nia aslam karon amra annotate use korechi and task_set ar vitore task er data thake karon amra prefetch_related use korechi and task_set ar vitore task er data thake tai amra project er sathe task er count nia aslam
-     return render(request,"show_task.html",{"projects":projects})
+    projects=Project.objects.annotate(task_count=Count('task')).order_by('task_count')#annotate ar kaj hosse database theke project er sathe task er count nia aslam karon amra annotate use korechi and task_set ar vitore task er data thake karon amra prefetch_related use korechi and task_set ar vitore task er data thake tai amra project er sathe task er count nia aslam
+    return render(request,"show_task.html",{"projects":projects})
 
 
 
