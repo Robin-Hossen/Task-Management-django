@@ -10,20 +10,14 @@ from django.db.models import Q,Max,Min,Count,Avg#Q object ar kaj hosse complex q
 
 
 def manager_dashboard(request):
+
+
+    type=request.GET.get("type",'all')#get method ar jonne type parameter nia aslam url theke jemon amra url a dile http://
+    print(type)
+
+
     tasks=Task.objects.select_related("details").prefetch_related("assigned_to").all()#query kom korar select_related and prefetch_related use korechi.karon here is perform one to one and many to many relation.
-    #getting total task
-    # total_task=tasks.count()    
-    # completed_task=tasks.filter(status="COMPLETED").count()
-    # in_progress_task=tasks.filter(status="IN_PROGRESS").count()
-    # pending_tasks=tasks.filter(status="PENDING").count()
-
-
-    # count={
-    #     "total_task":total_task,
-    #     "completed_task":completed_task,
-    #     "in_progress_task":in_progress_task,
-    #     "pending_tasks":pending_tasks
-    # }
+    
 
     count=Task.objects.aggregate(
         total=Count('id'),
@@ -31,6 +25,21 @@ def manager_dashboard(request):
         in_progress_task=Count('id',filter=Q(status="IN_PROGRESS")),
         pending_tasks=Count('id',filter=Q(status="PENDING"))
         )
+    
+
+    #retriving task data
+    base_query=Task.objects.select_related("details").prefetch_related("assigned_to")
+    if type=="completed":
+        tasks=base_query.filter(status="COMPLETED")
+    elif type=="in_progress":
+        tasks=base_query.filter(status="IN_PROGRESS")
+    elif type=="pending":
+        tasks=base_query.filter(status="PENDING")
+    elif type=="total":
+        tasks=base_query.all()    
+    
+    else: 
+        tasks=base_query.all()           
 
 
     context={

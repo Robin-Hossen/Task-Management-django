@@ -55,6 +55,7 @@
         <!-- Stats Grid  -->
         <div class="grid grid-cols-4 gap-6 mb-8">
           <!-- Total Task  -->
+           <a href= "{% url "manager_dashboard"%}?type=total">
           <div class="bg-white rounded-xl p-6 shadow-sm">
             <h3 class="text-sm font-medium text-gray-500 mb-4">TOTAL TASK</h3>
             <div class="flex justify-between items-start">
@@ -80,7 +81,9 @@
               </div>
             </div>
           </div>
+          </a>
           <!-- Completed Task  -->
+           <a href= "{% url "manager_dashboard"%}?type=completed">
           <div class="bg-white rounded-xl p-6 shadow-sm">
             <h3 class="text-sm font-medium text-gray-500 mb-4">
               COMPLETED TASK
@@ -108,7 +111,9 @@
               </div>
             </div>
           </div>
+        </a>
           <!-- Task In Progress  -->
+           <a href= "{% url "manager_dashboard"%}?type=in_progress">
           <div class="bg-white rounded-xl p-6 shadow-sm">
             <h3 class="text-sm font-medium text-gray-500 mb-4">
               TASK IN PROGRESS
@@ -136,6 +141,9 @@
               </div>
             </div>
           </div>
+        </a>
+          <!-- Pending Task  -->
+           <a href= "{% url "manager_dashboard"%}?type=pending">
           <div class="bg-white rounded-xl p-6 shadow-sm">
             <h3 class="text-sm font-medium text-gray-500 mb-4">TODOS</h3>
             <div class="flex justify-between items-start">
@@ -161,6 +169,7 @@
               </div>
             </div>
           </div>
+        </a>
         </div>
 
 
