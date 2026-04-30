@@ -2,15 +2,25 @@ from django.db import models
 
 # Create your models here.
 class Task(models.Model):
+    STATUS_CHOICES=[
+        ("PENDING","Pending"),
+        ("IN_PROGRESS","In Progress"),
+        ("COMPLETED","Completed")
+    ]
 #foriegn key ar jonne  ("")use kora hoise karon parent upore thake
     project=models.ForeignKey("Project",on_delete=models.CASCADE, default=1)
     assigned_to=models.ManyToManyField("Employee",related_name='tasks')
     title=models.CharField(max_length=500)
     description=models.TextField()
     due_date=models.DateField()
+    status=models.CharField(max_length=20, choices=STATUS_CHOICES, default="PENDING")
     is_completed=models.BooleanField(default=False)
     created_at=models.DateTimeField( auto_now_add=True)
     updated_at=models.DateTimeField(auto_now=True)
+
+
+    def __str__(self):
+        return self.title #django te __str__ method use kore amra model er object ke string hisabe represent korte pari. jemon amra jodi Task.objects.all() kori tahole amra task er title dekhte parbo karon __str__ method e amra title return korechi. jodi __str__ method na thake tahole amra task er object ke string hisabe represent korte parbo na and amra task er id dekhte parbo.
 
 
 #One To One Relation 
@@ -32,9 +42,10 @@ class TaskDetail(models.Model):
     task=models.OneToOneField(Task,on_delete=models.CASCADE,related_name='details')
     assigned_to=models.CharField(max_length=100)
     priority=models.CharField(max_length=1,choices=PRIORITY_OPTIONS,default=LOW)
+    notes=models.TextField(blank=True,null=True)#blank and null er mane hocche user jodi notes na dey tahole oita blank thakbe and null thakbe database a
 
-
-
+    def __str__(self):
+        return f"Details for Task: {self.task.title} with priority {self.get_priority_display()}"
 
 #many to one relation
 #project parent and Task hosse tar child
@@ -43,7 +54,11 @@ class TaskDetail(models.Model):
 #model make korar por foreign key add korte hobe 
 class Project(models.Model):
     name=models.CharField(max_length=200)
+    description=models.TextField(blank=True,null=True)
     start_date=models.DateField()
+
+    def __str__(self):
+        return self.name
 
 
 #many to many

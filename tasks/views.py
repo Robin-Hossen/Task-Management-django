@@ -1,7 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from tasks.forms import TaskForm,TaskModelForm
-from tasks.models import Employee,Task
+from tasks.models import Employee,Task,TaskDetail,Project
+from django.db.models import Q,Max,Min,Count,Avg#Q object ar kaj hosse complex query banano jemon amra jodi database theke task nia ashte chai jeta pending ache ba jeta due date 2026-04-23 tar age ache tahole amra Q object use kore ai query ta likhte parbo Task.objects.filter(Q(status="PENDING")|Q(due_date__lt="2026-04-23")) ai query te amra Q object use kore filter method er vitore complex query banate parbo 
+                            #and amra Q object er vitore | operator use kore OR condition create korte parbo and & operator use kore AND condition create korte parbo and ~ operator use kore NOT condition create korte parbo.
 
 # Create your views here.
 
@@ -95,3 +97,44 @@ def create_task(request):
         "form":form
     }
     return render(request,"task_form.html",context)
+
+
+
+
+#here i learn queryset filter and exclude and other querysets..(queryset.com) a gele onek gulo querysets er option dekhte parbo and ai gulo diye amra database theke specific data nia ashte parbo
+ 
+#def view_tasks(request):
+    #tasks=Task.objects.all()#database theke sob task nia aslam
+    # context={
+    #     "tasks":tasks
+    # }
+    # #retrive specific task
+    # return render(request,"show_task.html",context)
+
+    #task =Task.objects.filter(status="PENDING")#filter ar kaj hosse database theke specific data nia aslam 
+    #task=TaskDetail.objects.exclude(priority="H")#exclude ar kaj hosse database theke specific data bad dia nia aslam
+    #return render(request,"show_task.html",{"task":task})
+
+
+
+#select_related and prefetch_related (foreign and ono to one key ar jonne select_related and many to many ar jonne prefetch_related use kora hoy)
+#def view_tasks(request):
+    # task=Task.objects.select_related("details").all()#select_related ar kaj hosse foreign key ar jonne database theke data nia aslam and details ar data o nia aslam karon amra select_related use korechi and details ar data task er details ar vitore thake tai amra task er details ar vitore details ar data nia aslam
+    #task=TaskDetail.objects.select_related("task").all()#select_related ar kaj hosse foreign key ar jonne database theke data nia aslam and task ar data o nia aslam karon amra select_related use korechi and task ar data taskdetail ar vitore thake tai amra taskdetail er task ar vitore task ar data nia aslam
+    #task=Task.objects.select_related("project").all()#select_related ar kaj hosse foreign key ar jonne database theke data nia aslam and project ar data o nia aslam karon amra select_related use korechi and project ar data task er project ar vitore thake tai amra task er project ar vitore project ar data nia aslam
+   # task=Project.objects.prefetch_related("task_set").all()#prefetch_related ar kaj hosse many to many and reverse_relation key ar jonne kaj kore and task ar data o nia aslam karon amra prefetch_related use korechi and task ar data project er vitore thake tai amra project er task_set ar vitore task ar data nia aslam
+    #task_set hosse default related name jeta django provide kore many to many ar jonne and task_set ar vitore task ar data thake karon amra prefetch_related use korechi 
+
+   # return render(request,"show_task.html",{"task":task})
+
+
+
+#use aggregate function to calculate max, min, count and average of a field in a queryset
+def view_tasks(request):  
+    # task_count=Task.objects.aggregate(num_count=Count('id'))#count ar kaj hosse database theke task er total count nia aslam
+    
+     projects=Project.objects.annotate(task_count=Count('task')).order_by('task_count')#annotate ar kaj hosse database theke project er sathe task er count nia aslam karon amra annotate use korechi and task_set ar vitore task er data thake karon amra prefetch_related use korechi and task_set ar vitore task er data thake tai amra project er sathe task er count nia aslam
+     return render(request,"show_task.html",{"projects":projects})
+
+
+
