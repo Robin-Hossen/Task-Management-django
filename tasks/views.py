@@ -1,6 +1,8 @@
-from django.shortcuts import render
+from django.contrib import messages
+
+from django.shortcuts import render,redirect
 from django.http import HttpResponse
-from tasks.forms import TaskForm,TaskModelForm
+from tasks.forms import TaskDetailModelForm, TaskForm,TaskModelForm,TaskDetailModelForm
 from tasks.models import Employee,Task,TaskDetail,Project
 from django.db.models import Q,Max,Min,Count,Avg#Q object ar kaj hosse complex query banano jemon amra jodi database theke task nia ashte chai jeta pending ache ba jeta due date 2026-04-23 tar age ache tahole amra Q object use kore ai query ta likhte parbo Task.objects.filter(Q(status="PENDING")|Q(due_date__lt="2026-04-23")) ai query te amra Q object use kore filter method er vitore complex query banate parbo 
                             #and amra Q object er vitore | operator use kore OR condition create korte parbo and & operator use kore AND condition create korte parbo and ~ operator use kore NOT condition create korte parbo.
@@ -117,20 +119,28 @@ def task(request):
 def create_task(request):
     
     
-    form=TaskModelForm()# for Get 
+    task_form=TaskModelForm()# for Get 
+    task_detail_form=TaskDetailModelForm()# for Get
 
     #Post ar jonne
     if request.method=="POST":
-        form= TaskModelForm(request.POST)
+        task_form=TaskModelForm(request.POST)# for Post
+        task_detail_form=TaskDetailModelForm(request.POST)# for Post
         #print(form)
-        if form.is_valid():#valid check na korle data clean korte dei na
-            form.save()
+        if task_form.is_valid() and task_detail_form.is_valid():#valid check na korle data clean korte dei na
+           task=task_form.save()#database a data entry ar jonne kaj hosse
+           task_detail=task_detail_form.save(commit=False)#commit false ar mane hocche task_detail form er data save hobe na karon amra task_detail form er data te task ar data save korte chai tai commit false use korechi
+           task_detail.task=task#task_detail form er task field te task_form er data save kortechi
+           task_detail.save()#task_detail form er data save kortechi
 
-            return render(request,'task_form.html',{"form":form,"message":"task added successfully"})
+           messages.success(request,"Task Added Successfully")#django te messages framework use kore amra user ke success message dekhate parbo jodi task successfully add hoy tahole amra user ke success message dekhate parbo and jodi task add na hoy tahole amra user ke error message dekhate parbo
+
+           return redirect('create_task')
 
             
     context={
-        "form":form
+        "task_form": task_form,
+        "task_detail_form": task_detail_form
     }
     return render(request,"task_form.html",context)
 

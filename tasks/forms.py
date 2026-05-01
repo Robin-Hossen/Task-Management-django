@@ -1,5 +1,5 @@
 from django import forms
-from tasks.models import Task
+from tasks.models import Task,TaskDetail
 
 #Django Form that is basic ata future a kaje tmn lage na
 
@@ -67,6 +67,17 @@ class TaskModelForm(djangoFormMixin,forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.apply_styled_widgets()
+
+
+
+class TaskDetailModelForm(djangoFormMixin,forms.ModelForm):
+    class Meta:
+        model=TaskDetail
+        fields = ['priority','notes']
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.apply_styled_widgets()    
 
 
 
