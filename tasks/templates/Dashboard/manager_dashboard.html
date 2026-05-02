@@ -21,7 +21,10 @@
               <div class="flex items-center gap-2">
                 <div class="w-2 h-2 rounded-full bg-green-500"></div>
                 <span>{{ task.title }}</span>
-                <span>({{task.status}})</span>
+                {% comment %} <span>({{task.status}})</span> {% endcomment %}
+
+                <a href="{% url 'update_task' task.id %}" class="bg-rose-500 hover:bg-rose-700 text-white py-1 px-3 rounded">Edit</a>
+
               </div>
               <div>
                 <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-sm">

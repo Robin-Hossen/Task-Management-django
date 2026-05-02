@@ -146,6 +146,38 @@ def create_task(request):
 
 
 
+def update_task(request,id):
+
+    task=Task.objects.get(id=id)
+    task_form=TaskModelForm(instance=task)# instance ar kaj hosse database theke specific task er data nia aslam and oi data dia form k populate kore dilam
+    if task.details:
+        task_detail_form=TaskDetailModelForm(instance=task.details)# instance ar kaj hosse database theke specific task er details er data nia aslam and oi data dia form k populate kore dilam
+    
+
+    #Post ar jonne
+    if request.method=="POST":
+        task_form=TaskModelForm(request.POST,instance=task)# for Post
+        task_detail_form=TaskDetailModelForm(request.POST,instance=task.details)# for Post
+        #print(form)
+        if task_form.is_valid() and task_detail_form.is_valid():
+            task=task_form.save()
+            task_detail=task_detail_form.save(commit=False)
+            task_detail.task=task
+            task_detail.save()
+
+            messages.success(request,"Task updated Successfully")
+
+            return redirect('update_task', id=task.id)
+
+            
+    context={
+        "task_form": task_form,
+        "task_detail_form": task_detail_form
+    }
+    return render(request,"task_form.html",context)
+
+
+
 
 #here i learn queryset filter and exclude and other querysets..(queryset.com) a gele onek gulo querysets er option dekhte parbo and ai gulo diye amra database theke specific data nia ashte parbo
  
