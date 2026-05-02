@@ -23,8 +23,12 @@
                 <span>{{ task.title }}</span>
                 {% comment %} <span>({{task.status}})</span> {% endcomment %}
 
-                <a href="{% url 'update_task' task.id %}" class="bg-rose-500 hover:bg-rose-700 text-white py-1 px-3 rounded">Edit</a>
+                <a href="{% url 'update_task' task.id %}" class="bg-green-500 hover:bg-green-700 text-white py-1 px-3 rounded">Edit</a>
 
+                <form action="{% url 'delete_task' task.id %}" method="post">
+                  {% csrf_token %}
+                  <button type="submit" class="bg-red-500 hover:bg-red-700 text-white py-1 px-3 rounded">Delete</button>
+                </form>
               </div>
               <div>
                 <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-sm">

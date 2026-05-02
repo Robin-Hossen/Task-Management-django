@@ -178,6 +178,19 @@ def update_task(request,id):
 
 
 
+def delete_task(request,id):
+    if request.method=="POST":
+        task=Task.objects.get(id=id)
+        task.delete()
+
+        messages.success(request,"Task deleted successfully")
+        return redirect('manager_dashboard')
+    else:
+        messages.error(request,"Invalid request method")
+        return redirect('manager_dashboard')
+
+
+
 
 #here i learn queryset filter and exclude and other querysets..(queryset.com) a gele onek gulo querysets er option dekhte parbo and ai gulo diye amra database theke specific data nia ashte parbo
  
