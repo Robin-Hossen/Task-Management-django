@@ -31,6 +31,10 @@ class TaskForm(forms.Form):
 
 #mixin ar maddhome amra form er style set korte pari and onek line code ke kom kore dite pari
 class djangoFormMixin:
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.apply_styled_widgets() 
     default_css_classes = "border-2 border-gray-300 w-full p-3 rounded-lg shadow-sm focus:outline-none focus:border-blue-500 focus:ring-rose-600"
 
     def apply_styled_widgets(self):
@@ -43,6 +47,12 @@ class djangoFormMixin:
                 field.widget.attrs.update({'class': "border-2 border-gray-300 p-3 rounded-lg shadow-sm focus:outline-none focus:border-blue-500 focus:ring-rose-600", 'name': field_name})
             elif isinstance(field.widget, forms.CheckboxSelectMultiple):
                 field.widget.attrs.update({'class': "space-y-2", 'name': field_name})
+            elif isinstance(field.widget, forms.EmailInput):
+                field.widget.attrs.update({'class': self.default_css_classes})
+
+            elif isinstance(field.widget, forms.PasswordInput):
+                field.widget.attrs.update({'class': self.default_css_classes})
+    
 
 
 
@@ -64,9 +74,9 @@ class TaskModelForm(djangoFormMixin,forms.ModelForm):
         #     'assigned_to':forms.CheckboxSelectMultiple(attrs={'class':" rounded-lg p-2 mb-4 shadow-sm focus:border-rose-600 ",'name':'assigned_to'}),
         # }
     '''using mixin for styling form eta onek line code ke kom kore dey and amra jodi aro besi field add kori taholeo amader code onek clean thakbe'''
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.apply_styled_widgets()
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     self.apply_styled_widgets()
 
 
 
@@ -75,9 +85,7 @@ class TaskDetailModelForm(djangoFormMixin,forms.ModelForm):
         model=TaskDetail
         fields = ['priority','notes']
         
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.apply_styled_widgets()    
+       
 
 
 

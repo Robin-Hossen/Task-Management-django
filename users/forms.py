@@ -3,6 +3,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 import re
+from tasks.forms import djangoFormMixin
 
 class RegistrationForm(UserCreationForm):
         class Meta:
@@ -15,10 +16,10 @@ class RegistrationForm(UserCreationForm):
 
 
 
-class CustomRegistrationForm(forms.ModelForm):
+class CustomRegistrationForm(djangoFormMixin, forms.ModelForm):
     password1=forms.CharField(widget=forms.PasswordInput)
     confirm_password=forms.CharField(widget=forms.PasswordInput)
-    email=forms.EmailField()
+    email=forms.EmailField(required=True)
 
     class Meta:
         model = User
