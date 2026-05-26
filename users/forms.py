@@ -1,6 +1,6 @@
 
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 import re
 from tasks.forms import djangoFormMixin
@@ -64,7 +64,13 @@ class CustomRegistrationForm(djangoFormMixin, forms.ModelForm):
         if User.objects.filter(email=email).exists():# checking if email already exists in database or not
             raise forms.ValidationError("Email already exists")
         return email
+    
 
+class LoginForm( djangoFormMixin, AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        
 
 
     
