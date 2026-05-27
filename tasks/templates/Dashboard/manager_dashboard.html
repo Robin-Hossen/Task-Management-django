@@ -4,7 +4,7 @@
  {% block tasks %}
  
  <!-- Task Table  -->
-        <div class="bg-white rounded-xl shadow-sm">
+        <div class="bg-white rounded-xl shadow-sm mb-9">
           <div
             class="grid grid-cols-4 p-4 border-b border-gray-100 text-sm text-gray-500"
           >
@@ -20,8 +20,10 @@
             <div class="grid grid-cols-4 gap-4 p-4 items-center">
               <div class="flex items-center gap-2">
                 <div class="w-2 h-2 rounded-full bg-green-500"></div>
-                <span>{{ task.title }}</span>
+
+                <a href="{% url 'task-details' task.id %}">{{ task.title }}</a>
                 {% comment %} <span>({{task.status}})</span> {% endcomment %}
+
 
                 <a href="{% url 'update_task' task.id %}" class="bg-green-500 hover:bg-green-700 text-white py-1 px-3 rounded">Edit</a>
 

@@ -53,14 +53,14 @@ def manager_dashboard(request):
         "tasks":tasks,
         "count":count
     }
-    return render(request,"dashboard/manager_dashboard.html",context)
+    return render(request,"Dashboard/manager_dashboard.html",context)
 
 @user_passes_test(is_employee, login_url='no-permission')
 def employee_dashboard(request):
-    return render(request,'dashboard/user_dashboard.html')
+    return render(request,'Dashboard/user_dashboard.html')
 
 def dashboard(request):
-    return render(request,'dashboard/dashboard.html')
+    return render(request,'Dashboard/dashboard.html')
 
 def task(request):
     
@@ -237,6 +237,13 @@ def view_tasks(request):
     
     projects=Project.objects.annotate(task_count=Count('task')).order_by('task_count')#annotate ar kaj hosse database theke project er sathe task er count nia aslam karon amra annotate use korechi and task_set ar vitore task er data thake karon amra prefetch_related use korechi and task_set ar vitore task er data thake tai amra project er sathe task er count nia aslam
     return render(request,"show_task.html",{"projects":projects})
+
+
+@login_required
+@permission_required('tasks.view_task', login_url='no-permission')
+def task_details(request,task_id):
+    task=Task.objects.get(id=task_id)
+    return render(request,"task_details.html",{"task":task})
 
 
 

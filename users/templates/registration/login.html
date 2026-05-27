@@ -1,15 +1,7 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="{% static 'css/output.css' %}">
-</head>
-<body>
-    <h1> Welcome to Login Page</h1>
-    <div>
+{% extends "base.html" %}
+{% block content %}
+    <div class="container mx-auto p-6 w-1/2">
+        <h2 class="text-2xl font-semibold mb-4">Login to Your Account</h2>
        {% if messages %}
                 {% for message in messages %}
                    <div class="px-2 py-1 {% if message.tags == "success" %}bg-green-500{% endif %} ">
@@ -26,5 +18,4 @@
             <button class="bg-blue-500 text-white px-4 py-3 mt-3 rounded" type="submit">Login</button>
         </form>
     </div>
-</body>
-</html>
+{% endblock content %}
