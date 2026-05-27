@@ -70,11 +70,25 @@ class LoginForm( djangoFormMixin, AuthenticationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-class AssignRoleForm(forms.Form):
+class AssignRoleForm(djangoFormMixin,forms.Form):
         role=forms.ModelChoiceField(
             queryset=Group.objects.all(), 
             empty_label="Select Role",
             )
+
+class CreateGroupForm(djangoFormMixin,forms.ModelForm):
+        permissions=forms.ModelMultipleChoiceField(
+                queryset=Permission.objects.all(),
+                widget=forms.CheckboxSelectMultiple,
+                required=False,
+                label=" Assign Permissions"
+
+        )
+        class Meta:
+                model=Group
+                fields=['name','permissions']
+
+
 
         
 

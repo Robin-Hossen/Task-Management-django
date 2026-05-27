@@ -6,11 +6,16 @@ from tasks.forms import TaskDetailModelForm, TaskForm,TaskModelForm,TaskDetailMo
 from tasks.models import Employee,Task,TaskDetail,Project
 from django.db.models import Q,Max,Min,Count,Avg#Q object ar kaj hosse complex query banano jemon amra jodi database theke task nia ashte chai jeta pending ache ba jeta due date 2026-04-23 tar age ache tahole amra Q object use kore ai query ta likhte parbo Task.objects.filter(Q(status="PENDING")|Q(due_date__lt="2026-04-23")) ai query te amra Q object use kore filter method er vitore complex query banate parbo 
                             #and amra Q object er vitore | operator use kore OR condition create korte parbo and & operator use kore AND condition create korte parbo and ~ operator use kore NOT condition create korte parbo.
-
+from django.contrib.auth.decorators import login_required, permission_required,user_passes_test
 # Create your views here.
 
+def is_manager(user):
+    return user.groups.filter(name='Manager').exists()#user ar group er vitore manager group ache kina check kore return kore true or false
 
+def is_employee(user):
+    return user.groups.filter(name='Employee').exists()
 
+@user_passes_test(is_manager, login_url='no-permission')
 def manager_dashboard(request):
 
 
@@ -50,7 +55,8 @@ def manager_dashboard(request):
     }
     return render(request,"dashboard/manager_dashboard.html",context)
 
-def user_dashboard(request):
+@user_passes_test(is_employee, login_url='no-permission')
+def employee_dashboard(request):
     return render(request,'dashboard/user_dashboard.html')
 
 def dashboard(request):
@@ -115,7 +121,8 @@ def task(request):
 
 
 #after create a django model form
-
+@login_required
+@permission_required('tasks.add_task', login_url='no-permission')
 def create_task(request):
     
     
@@ -145,7 +152,8 @@ def create_task(request):
     return render(request,"task_form.html",context)
 
 
-
+@login_required
+@permission_required('tasks.change_task', login_url='no-permission')
 def update_task(request,id):
 
     task=Task.objects.get(id=id)
@@ -177,7 +185,8 @@ def update_task(request,id):
     return render(request,"task_form.html",context)
 
 
-
+@login_required
+@permission_required('tasks.delete_task', login_url='no-permission')
 def delete_task(request,id):
     if request.method=="POST":
         task=Task.objects.get(id=id)
@@ -221,6 +230,8 @@ def delete_task(request,id):
 
 
 #use aggregate function to calculate max, min, count and average of a field in a queryset
+@login_required
+@permission_required('tasks.view_task', login_url='no-permission')
 def view_tasks(request):  
     # task_count=Task.objects.aggregate(num_count=Count('id'))#count ar kaj hosse database theke task er total count nia aslam
     
