@@ -9,6 +9,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.contrib import messages
 from users.forms import LoginForm
 from django.contrib.auth.decorators import login_required,user_passes_test
+from django.db.models import Prefetch
 
 #test function to check if user is admin
 def is_admin(user):
@@ -69,7 +70,14 @@ def activate_user_account(request, user_id, token):
 
 @user_passes_test(is_admin, login_url='no-permission')    
 def admin_dashboard(request):
-    users=User.objects.all()
+    users=User.objects.prefetch_related(
+        Prefetch('groups', queryset=Group.objects.all(),to_attr='all_groups')
+    ).all()
+    for user in users:
+        if user.all_groups:
+            user.groups_name=user.all_groups[0].name
+        else:
+            user.groups_name='No Group Assigned'
     return render(request, 'admin/dashboard.html', {'users': users})   
 
 @user_passes_test(is_admin, login_url='no-permission')
@@ -82,7 +90,7 @@ def assign_role(request, user_id):
             role = form.cleaned_data['role']
             user.groups.clear()  # Clear existing roles
             user.groups.add(role)  # Assign new role
-            messages.success(request, f"Role '{role.name}' assigned to user '{user.username}' successfully.")
+            messages.success(request, f"Group '{role.name}' assigned to user '{user.username}' successfully.")
             user.save()
             return redirect('admin-dashboard')
     return render(request, 'admin/assign_role.html', {'form': form, 'user': user})    
@@ -104,5 +112,5 @@ def create_group(request):
 
 @user_passes_test(is_admin, login_url='no-permission')
 def group_list(request):
-    groups = Group.objects.all()
+    groups = Group.objects.prefetch_related('permissions').all()
     return render(request, 'admin/group_list.html', {'groups': groups})
