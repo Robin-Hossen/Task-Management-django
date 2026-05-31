@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from tasks.forms import TaskDetailModelForm, TaskForm,TaskModelForm,TaskDetailModelForm
-from tasks.models import Employee,Task,TaskDetail,Project
+from tasks.models import Task,TaskDetail,Project
 from django.db.models import Q,Max,Min,Count,Avg#Q object ar kaj hosse complex query banano jemon amra jodi database theke task nia ashte chai jeta pending ache ba jeta due date 2026-04-23 tar age ache tahole amra Q object use kore ai query ta likhte parbo Task.objects.filter(Q(status="PENDING")|Q(due_date__lt="2026-04-23")) ai query te amra Q object use kore filter method er vitore complex query banate parbo 
                             #and amra Q object er vitore | operator use kore OR condition create korte parbo and & operator use kore AND condition create korte parbo and ~ operator use kore NOT condition create korte parbo.
 from django.contrib.auth.decorators import login_required, permission_required,user_passes_test

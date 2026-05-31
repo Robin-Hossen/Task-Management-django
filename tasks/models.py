@@ -11,6 +11,7 @@ class Task(models.Model):
     ]
 #foriegn key ar jonne  ("")use kora hoise karon parent upore thake
     project=models.ForeignKey("Project",on_delete=models.CASCADE, default=1)
+    # assigned_to=models.ManyToManyField('Employee',related_name='tasks')
     assigned_to=models.ManyToManyField(User,related_name='tasks')
     title=models.CharField(max_length=500)
     description=models.TextField()
@@ -70,12 +71,7 @@ class Project(models.Model):
 #task= onekgula employee akta task
 #employee = onekgula task ar jonno assign ase
 
-class Employee(models.Model):
-    name=models.CharField(max_length=100)
-    email=models.EmailField(unique=True)
 
-    def __str__(self):
-        return self.name
 
 
 

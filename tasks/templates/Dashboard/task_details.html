@@ -77,11 +77,11 @@
                {% for emp in task.assigned_to.all %}
                     <div class="flex items-center gap-4">
                         <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white">
-                           {{ emp.name|slice:":2" }}
+                           {{ emp.first_name|slice:":2" }}
                         </div>
                         <div>
-                            <div class="font-semibold">{{ emp.name }}</div>
-                            <div class="text-gray-600">Administrator</div>
+                            <div class="font-semibold">{{ emp.first_name }} {{ emp.last_name }}</div>
+                            <div class="text-gray-600">{{ emp.groups.first.name|default:"No Role" }}</div>
                         </div>
                     </div>
                 {% endfor %}
