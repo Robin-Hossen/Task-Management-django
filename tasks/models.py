@@ -46,7 +46,7 @@ class TaskDetail(models.Model):
             Task,
             on_delete=models.DO_NOTHING,
             related_name='details')
-    asset=models.ImageField(upload_to='tasks_asset', blank=True, null=True)
+    asset=models.ImageField(upload_to='tasks_asset', blank=True, null=True, default='https://media.istockphoto.com/id/2173059563/vector/coming-soon-image-on-white-background-no-photo-available.jpg?s=612x612&w=0&k=20&c=v0a_B58wPFNDPULSiw_BmPyhSNCyrP_d17i2BPPyDTk=')
     priority=models.CharField(max_length=1,choices=PRIORITY_OPTIONS,default=LOW)
     notes=models.TextField(blank=True,null=True)#blank and null er mane hocche user jodi notes na dey tahole oita blank thakbe and null thakbe database a
 

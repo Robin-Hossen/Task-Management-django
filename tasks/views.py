@@ -243,7 +243,17 @@ def view_tasks(request):
 @permission_required('tasks.view_task', login_url='no-permission')
 def task_details(request,task_id):
     task=Task.objects.get(id=task_id)
-    return render(request,"task_details.html",{"task":task})
+    status_choice=Task.STATUS_CHOICES
+    if request.method=="POST":
+        selected_status=request.POST.get("task_status")
+        print(selected_status)
+        task.status=selected_status
+        task.save()
+        messages.success(request,"Task status updated successfully")
+        return redirect('task-details',task.id)
+    return render(request,"task_details.html",{"task":task,"status_choice":status_choice})
+
+
 
 
 
