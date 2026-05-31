@@ -7,6 +7,7 @@ from tasks.models import Task,TaskDetail,Project
 from django.db.models import Q,Max,Min,Count,Avg#Q object ar kaj hosse complex query banano jemon amra jodi database theke task nia ashte chai jeta pending ache ba jeta due date 2026-04-23 tar age ache tahole amra Q object use kore ai query ta likhte parbo Task.objects.filter(Q(status="PENDING")|Q(due_date__lt="2026-04-23")) ai query te amra Q object use kore filter method er vitore complex query banate parbo 
                             #and amra Q object er vitore | operator use kore OR condition create korte parbo and & operator use kore AND condition create korte parbo and ~ operator use kore NOT condition create korte parbo.
 from django.contrib.auth.decorators import login_required, permission_required,user_passes_test
+from users.views import is_admin
 # Create your views here.
 
 def is_manager(user):
@@ -252,6 +253,18 @@ def task_details(request,task_id):
         messages.success(request,"Task status updated successfully")
         return redirect('task-details',task.id)
     return render(request,"task_details.html",{"task":task,"status_choice":status_choice})
+
+
+@login_required
+def dashboard(request):
+    if is_manager(request.user):
+        return redirect('manager_dashboard')
+    elif is_employee(request.user):
+        return redirect('user-dashboard')
+    elif is_admin(request.user):
+        return redirect('admin-dashboard')
+    
+    return redirect('no-permission')
 
 
 
