@@ -83,7 +83,7 @@ class TaskModelForm(djangoFormMixin,forms.ModelForm):
 class TaskDetailModelForm(djangoFormMixin,forms.ModelForm):
     class Meta:
         model=TaskDetail
-        fields = ['priority','notes']
+        fields = ['priority','notes','asset']
         
        
 

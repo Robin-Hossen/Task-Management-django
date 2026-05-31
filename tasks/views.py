@@ -132,7 +132,7 @@ def create_task(request):
     #Post ar jonne
     if request.method=="POST":
         task_form=TaskModelForm(request.POST)# for Post
-        task_detail_form=TaskDetailModelForm(request.POST)# for Post
+        task_detail_form=TaskDetailModelForm(request.POST,request.FILES)# for Post
         #print(form)
         if task_form.is_valid() and task_detail_form.is_valid():#valid check na korle data clean korte dei na
            task=task_form.save()#database a data entry ar jonne kaj hosse
