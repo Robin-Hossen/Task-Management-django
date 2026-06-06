@@ -11,6 +11,8 @@ from users.views import is_admin
 from django.http import HttpResponse
 from django.views import View
 from django.utils.decorators import method_decorator
+from django.contrib.auth.mixins import LoginRequiredMixin,PermissionRequiredMixin
+from django.views.generic.base import ContextMixin, TemplateResponseMixin
 
 
 
@@ -165,17 +167,24 @@ def create_task(request):
 
 #create Task replace by class view
 
-@method_decorator(create_task_decorators, name='dispatch')#method_decorator ar kaj hosse class based view er method gulo te decorator apply kora jemon amra jodi class based view er get method ar vitore login_required and permission_required decorator apply korte chai tahole amra method_decorator use korechi and dispatch method ar vitore login_required and permission_required decorator apply korechi karon dispatch method ar vitore get, post, put, delete method gulo call hoy tai amra dispatch method ar vitore login_required and permission_required decorator apply korechi tahole get, post, put, delete method gulo te login_required and permission_required decorator apply hoye jabe
+# @method_decorator(create_task_decorators, name='dispatch')#method_decorator ar kaj hosse class based view er method gulo te decorator apply kora jemon amra jodi class based view er get method ar vitore login_required and permission_required decorator apply korte chai tahole amra method_decorator use korechi and dispatch method ar vitore login_required and permission_required decorator apply korechi karon dispatch method ar vitore get, post, put, delete method gulo call hoy tai amra dispatch method ar vitore login_required and permission_required decorator apply korechi tahole get, post, put, delete method gulo te login_required and permission_required decorator apply hoye jabe
 
-class CreateTask(View):
+class CreateTask(ContextMixin,LoginRequiredMixin,PermissionRequiredMixin,View):
+
+    permission_required='tasks.add_task'
+    login_url='sign-in'
+    template_name="task_form.html"
+
+    def get_context_data(self, **kwargs):
+        context=super().get_context_data(**kwargs)
+        context["task_form"]=kwargs.get("task_form",TaskModelForm())
+        context["task_detail_form"]=kwargs.get("task_detail_form",TaskDetailModelForm())
+        return context
+    
     def get(self,request,*args,**kwargs):
-        task_form=TaskModelForm()# for Get 
-        task_detail_form=TaskDetailModelForm()# for Get
-        context={
-            "task_form": task_form,
-            "task_detail_form": task_detail_form
-        }
-        return render(request,"task_form.html",context)
+        
+        context=self.get_context_data()
+        return render(request,self.template_name,context)
     
 
     def post(self,request,*args,**kwargs):
@@ -190,7 +199,8 @@ class CreateTask(View):
 
            messages.success(request,"Task Added Successfully")#django te messages framework use kore amra user ke success message dekhate parbo jodi task successfully add hoy tahole amra user ke success message dekhate parbo and jodi task add na hoy tahole amra user ke error message dekhate parbo
 
-           return redirect('create_task')
+           context = self.get_context_data(task_form=task_form, task_detail_form=task_detail_form)
+           return render(request,self.template_name,context)
 
 
 @login_required
