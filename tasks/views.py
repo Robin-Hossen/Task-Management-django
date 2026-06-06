@@ -14,6 +14,8 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import LoginRequiredMixin,PermissionRequiredMixin
 from django.views.generic.base import ContextMixin
 from django.views.generic import ListView
+from django.views.generic import DetailView,UpdateView
+
 
 
 
@@ -166,6 +168,9 @@ class CreateTask(ContextMixin,LoginRequiredMixin,PermissionRequiredMixin,View):
            return render(request,self.template_name,context)
 
 
+
+
+
 @login_required
 @permission_required('tasks.change_task', login_url='no-permission')
 def update_task(request,id):
@@ -179,7 +184,7 @@ def update_task(request,id):
     #Post ar jonne
     if request.method=="POST":
         task_form=TaskModelForm(request.POST,instance=task)# for Post
-        task_detail_form=TaskDetailModelForm(request.POST,instance=task.details)# for Post
+        task_detail_form=TaskDetailModelForm(request.POST,request.FILES,instance=task.details)# for Post
         #print(form)
         if task_form.is_valid() and task_detail_form.is_valid():
             task=task_form.save()
@@ -197,6 +202,47 @@ def update_task(request,id):
         "task_detail_form": task_detail_form
     }
     return render(request,"task_form.html",context)
+
+
+
+class UpdateTask(UpdateView):
+    model=Task
+    form_class=TaskModelForm
+    template_name="task_form.html"
+    context_object_name="task"
+    pk_url_kwarg="id"
+
+    def get_context_data(self, **kwargs):
+        context=super().get_context_data(**kwargs)
+        context['task_form']=self.get_form()#task_form er data nia aslam
+        
+        if hasattr(self.object,'details') and self.object.details:
+            context["task_detail_form"]=TaskDetailModelForm(instance=self.object.details)
+
+        else:
+            context["task_detail_form"]=TaskDetailModelForm()
+        return context
+    
+    def post(self,request,*args,**kwargs):
+        self.object=self.get_object()#specific task er data nia aslam
+        task_form=TaskModelForm(request.POST,instance=self.object)# for Post
+
+        task_detail_form=TaskDetailModelForm(request.POST,request.FILES,instance=getattr(self.object,'details',None))# for Post
+
+        if task_form.is_valid() and task_detail_form.is_valid():
+            task=task_form.save()
+            task_detail=task_detail_form.save(commit=False)
+            task_detail.task=task
+            task_detail.save()
+
+            messages.success(request,"Task updated Successfully")
+
+            return redirect('update_task', self.object.id)
+        return redirect('update_task', self.object.id)
+
+    
+
+
 
 
 @login_required
@@ -242,6 +288,8 @@ class ViewProjects(ListView):
         return Project.objects.annotate(task_count=Count('task')).order_by('task_count')
 
 
+
+
 @login_required
 @permission_required('tasks.view_task', login_url='no-permission')
 def task_details(request,task_id):
@@ -255,6 +303,29 @@ def task_details(request,task_id):
         messages.success(request,"Task status updated successfully")
         return redirect('task-details',task.id)
     return render(request,"task_details.html",{"task":task,"status_choice":status_choice})
+
+
+
+class TaskDetailView(DetailView):
+    model=Task
+    template_name="task_details.html"
+    context_object_name="task"
+    pk_url_kwarg="task_id"
+
+    def get_context_data(self, **kwargs):
+        context=super().get_context_data(**kwargs)#{'task': <Task: Task object (1)>}
+        context["status_choice"]=Task.STATUS_CHOICES#{'task': <Task: Task object (1)>, 'status_choice': [('PENDING', 'Pending'), ('IN_PROGRESS', 'In Progress'), ('COMPLETED', 'Completed')]}
+        return context
+    
+
+    def post(self,request,*args,**kwargs):
+        task=self.get_object()#specific task er data nia aslam
+        selected_status=request.POST.get("task_status")#form theke selected status nia aslam
+        task.status=selected_status#task er status update korechi
+        task.save()#task er data save korechi
+        messages.success(request,"Task status updated successfully")#success message dekhatechi
+        return redirect('task-details',task.id)#redirect korechi task details page a jekhane task er updated status dekhabe
+
 
 
 @login_required
