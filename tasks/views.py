@@ -12,13 +12,13 @@ from django.http import HttpResponse
 from django.views import View
 from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import LoginRequiredMixin,PermissionRequiredMixin
-from django.views.generic.base import ContextMixin, TemplateResponseMixin
+from django.views.generic.base import ContextMixin
+from django.views.generic import ListView
 
 
 
 
-#variables for list of decorators
-create_task_decorators=[login_required,permission_required('tasks.add_task', login_url='no-permission')]
+
 
 # Create your views here.
 
@@ -93,44 +93,6 @@ def task(request):
     return render(request,'task.html',context)
 
 
-#before create django model form
-
-
-# def create_task(request):
-#     #database theke employy der nia aslm then taskForm k call dlm oi data dia
-#     employees=Employee.objects.all()
-#     form=TaskForm(employees=employees)# for Get 
-
-#     #Post ar jonne
-#     if request.method=="POST":
-#         form= TaskForm(request.POST,employees=employees)
-#         #print(form)
-#         if form.is_valid():#valid check na korle data clean korte dei na
-#             #why clean , karon data ar sate onek html format dei ai jonne ata default
-#             #print(form.cleaned_data)
-#             data=form.cleaned_data #data base a data entry ar jonne kaj hosse
-#             title=data.get('title')
-#             description=data.get('description')
-#             due_date=data.get('due_date')
-#             assigned_to=data.get('assigned_to')
-
-#             task=Task.objects.create(title=title,description=description,due_date=due_date)
-
-
-#             #Assign employee to tasks
-#             for emp_id in assigned_to:
-#                 employee=Employee.objects.get(id=emp_id)
-#                 task.assigned_to.add(employee)
-
-#             return HttpResponse("Task Added Successfully")   
-
-#     context={
-#         "form":form
-#     }
-#     return render(request,"task_form.html",context)
-
-
-
 
 
 #after create a django model form
@@ -166,7 +128,8 @@ def create_task(request):
 
 
 #create Task replace by class view
-
+#variables for list of decorators
+create_task_decorators=[login_required,permission_required('tasks.add_task', login_url='no-permission')]
 # @method_decorator(create_task_decorators, name='dispatch')#method_decorator ar kaj hosse class based view er method gulo te decorator apply kora jemon amra jodi class based view er get method ar vitore login_required and permission_required decorator apply korte chai tahole amra method_decorator use korechi and dispatch method ar vitore login_required and permission_required decorator apply korechi karon dispatch method ar vitore get, post, put, delete method gulo call hoy tai amra dispatch method ar vitore login_required and permission_required decorator apply korechi tahole get, post, put, delete method gulo te login_required and permission_required decorator apply hoye jabe
 
 class CreateTask(ContextMixin,LoginRequiredMixin,PermissionRequiredMixin,View):
@@ -252,32 +215,7 @@ def delete_task(request,id):
 
 
 
-#here i learn queryset filter and exclude and other querysets..(queryset.com) a gele onek gulo querysets er option dekhte parbo and ai gulo diye amra database theke specific data nia ashte parbo
  
-#def view_tasks(request):
-    #tasks=Task.objects.all()#database theke sob task nia aslam
-    # context={
-    #     "tasks":tasks
-    # }
-    # #retrive specific task
-    # return render(request,"show_task.html",context)
-
-    #task =Task.objects.filter(status="PENDING")#filter ar kaj hosse database theke specific data nia aslam 
-    #task=TaskDetail.objects.exclude(priority="H")#exclude ar kaj hosse database theke specific data bad dia nia aslam
-    #return render(request,"show_task.html",{"task":task})
-
-
-
-#select_related and prefetch_related (foreign and ono to one key ar jonne select_related and many to many ar jonne prefetch_related use kora hoy)
-#def view_tasks(request):
-    # task=Task.objects.select_related("details").all()#select_related ar kaj hosse foreign key ar jonne database theke data nia aslam and details ar data o nia aslam karon amra select_related use korechi and details ar data task er details ar vitore thake tai amra task er details ar vitore details ar data nia aslam
-    #task=TaskDetail.objects.select_related("task").all()#select_related ar kaj hosse foreign key ar jonne database theke data nia aslam and task ar data o nia aslam karon amra select_related use korechi and task ar data taskdetail ar vitore thake tai amra taskdetail er task ar vitore task ar data nia aslam
-    #task=Task.objects.select_related("project").all()#select_related ar kaj hosse foreign key ar jonne database theke data nia aslam and project ar data o nia aslam karon amra select_related use korechi and project ar data task er project ar vitore thake tai amra task er project ar vitore project ar data nia aslam
-   # task=Project.objects.prefetch_related("task_set").all()#prefetch_related ar kaj hosse many to many and reverse_relation key ar jonne kaj kore and task ar data o nia aslam karon amra prefetch_related use korechi and task ar data project er vitore thake tai amra project er task_set ar vitore task ar data nia aslam
-    #task_set hosse default related name jeta django provide kore many to many ar jonne and task_set ar vitore task ar data thake karon amra prefetch_related use korechi 
-
-   # return render(request,"show_task.html",{"task":task})
-
 
 
 #use aggregate function to calculate max, min, count and average of a field in a queryset
@@ -288,6 +226,20 @@ def view_tasks(request):
     
     projects=Project.objects.annotate(task_count=Count('task')).order_by('task_count')#annotate ar kaj hosse database theke project er sathe task er count nia aslam karon amra annotate use korechi and task_set ar vitore task er data thake karon amra prefetch_related use korechi and task_set ar vitore task er data thake tai amra project er sathe task er count nia aslam
     return render(request,"show_task.html",{"projects":projects})
+
+
+#variables for list of decorators
+view_project_decorators=[login_required,permission_required('projects.view_project', login_url='no-permission')]
+
+@method_decorator(view_project_decorators, name='dispatch')
+class ViewProjects(ListView):
+    model=Project
+    template_name="show_task.html"
+    context_object_name="projects"
+
+    def get_queryset(self):
+
+        return Project.objects.annotate(task_count=Count('task')).order_by('task_count')
 
 
 @login_required

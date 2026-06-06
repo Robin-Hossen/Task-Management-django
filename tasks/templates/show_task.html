@@ -6,29 +6,7 @@
     <title>Document</title>
 </head>
 <body>
-    {% comment %} <div>
-        {% comment %} many to many ar jonne html ,,Project field ar jonne  {% endcomment %}
-
-        {% comment %} <ul>
-            {% for project in task %}
-            <li>
-                <p> {{project.name}}</p>
-                    {% for task in project.task_set.all %}
-                        <p>{{task.title}}</p>
-                    
-                    {% endfor %}
-            </li>
-            {% endfor %}
-            
-        </ul>
-    
-    </div> {% endcomment %}
-
-    {% comment %} <div>
-        aggregate function ar jonne html
-        <p>Total Task Count: {{task_count.num_count}}</p>
-    </div>  {% endcomment %}
-
+   
     <div>
         {% comment %} annotate function ar jonne html {% endcomment %}
         <ul>
