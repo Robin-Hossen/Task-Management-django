@@ -10,6 +10,10 @@ from django.contrib import messages
 from users.forms import LoginForm
 from django.contrib.auth.decorators import login_required,user_passes_test
 from django.db.models import Prefetch
+from django.contrib.auth.views import LoginView
+from django.views.generic import TemplateView
+
+
 
 #test function to check if user is admin
 def is_admin(user):
@@ -46,6 +50,19 @@ def sign_in(request):
             return redirect('home')
     return render(request,"registration/login.html",{"form":form})
 
+
+class CustomLoginView(LoginView):
+
+    form_class = LoginForm
+    def get_success_url(self):
+        next_url = self.request.GET.get('next')
+        if next_url:
+            return next_url
+        else:
+            return super().get_success_url()
+        
+
+
 @login_required
 def sign_out(request):
     if request.method=='POST':
@@ -78,7 +95,9 @@ def admin_dashboard(request):
             user.groups_name=user.all_groups[0].name
         else:
             user.groups_name='No Group Assigned'
-    return render(request, 'admin/dashboard.html', {'users': users})   
+    return render(request, 'admin/dashboard.html', {'users': users})  
+
+
 
 @user_passes_test(is_admin, login_url='no-permission')
 def assign_role(request, user_id):
@@ -114,3 +133,18 @@ def create_group(request):
 def group_list(request):
     groups = Group.objects.prefetch_related('permissions').all()
     return render(request, 'admin/group_list.html', {'groups': groups})
+
+
+
+
+class ProfileView(TemplateView):
+    template_name = 'accounts/profile.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        context['username'] = user.username
+        context['email'] = user.email
+        context['name']=user.get_full_name()
+        context['member_since']=user.date_joined
+        context['last_login']=user.last_login
+        return context
