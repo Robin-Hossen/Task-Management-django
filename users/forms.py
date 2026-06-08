@@ -102,6 +102,35 @@ class CustomPasswordResetConfirmForm(djangoFormMixin,SetPasswordForm):
     pass                
 
 
+class EditProfileForm(djangoFormMixin,forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email']
+    bio=forms.CharField(widget=forms.Textarea, required=False,label="Bio")
+    profile_image=forms.ImageField(required=False,label="Profile Image")
+
+    def __init__(self, *args, **kwargs):
+        self.userprofile = kwargs.pop('userprofile', None)
+        super().__init__(*args, **kwargs)
+
+
+        if self.userprofile:
+            self.fields['bio'].initial = self.userprofile.bio
+            self.fields['profile_image'].initial = self.userprofile.profile_image
+
+    def save(self, commit=True):
+        user = super().save(commit)
+        #save userprofile jodi thake
+        if self.userprofile:
+             self.userprofile.bio=self.cleaned_data.get('bio')
+             self.userprofile.profile_image=self.cleaned_data.get('profile_image')
+             if commit:
+                self.userprofile.save()
+        if commit:
+            user.save()  
+
+        return user        
+
 
         
 
